@@ -1,2 +1,2 @@
-tape-server
+All storage is tape
 ===========
