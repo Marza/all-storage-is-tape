@@ -1,39 +1,67 @@
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <netdb.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h> 
 
-int main()
+void error(const char *msg)
 {
-    int sock, bytes_recieved;
-    char send_data[1024], recv_data[1024];
-    struct hostent *host;
-    struct sockaddr_in server_addr;
+    perror(msg);
+    exit(0);
+}
 
-    host = gethostbyname("127.0.0.1");
-    sock = socket(AF_INET, SOCK_STREAM, 0);
+int main(int argc, char *argv[])
+{
+    int sockfd, portno, n;
+    struct sockaddr_in serv_addr;
+    struct hostent *server;
 
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(5000);
-    server_addr.sin_addr = *((struct in_addr *)host->h_addr);
-    bzero(&(server_addr.sin_zero), 8);
+    char buffer[256];
+    if (argc < 3) {
+       fprintf(stderr, "usage %s hostname port\n", argv[0]);
+       exit(0);
+    }
+    portno = atoi(argv[2]);
+    server = gethostbyname(argv[1]);
+    if (server == NULL) {
+        fprintf(stderr, "ERROR, no such host\n");
+        exit(0);
+    }
+    bzero((char *) &serv_addr, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    bcopy((char *)server->h_addr, 
+         (char *)&serv_addr.sin_addr.s_addr,
+         server->h_length);
+    serv_addr.sin_port = htons(portno);
 
-    connect(sock, (struct sockaddr *)&server_addr, sizeof(struct sockaddr));
-
-    int i = 0;
-    for(i = 0; i < 1000; i++)
-    {
-        // bytes_recieved = recv(sock, recv_data, 1024, 0);
-        // recv_data[bytes_recieved] = '\0';
-        // printf("\nRecieved data = %s " , recv_data);
-
-        send(sock, send_data, 1024, 0);
+    printf("Started client!\n");
+    char data[1024];
+    for (int i = 0; i < 1024; i++) {
+        data[i] = 97 + rand() % 26;
     }
 
+    for (int i = 0; i < 1000; i++) {
+        sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        if (sockfd < 0)
+            error("ERROR opening socket");
+        if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
+            error("ERROR connecting");
+
+        n = write(sockfd, data, 1024);
+        if (n < 0) 
+             error("ERROR writing to socket");
+
+        bzero(buffer, 256);
+        n = read(sockfd, buffer, 255);
+        if (n < 0) 
+             error("ERROR reading from socket");
+        printf("%s\n", buffer);
+
+        close(sockfd);
+    }
+    
     return 0;
-} 
+}
