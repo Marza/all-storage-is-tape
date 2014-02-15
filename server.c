@@ -39,23 +39,23 @@ int main(int argc, char *argv[])
     listen(sockfd, 5);
     clilen = sizeof(cli_addr);
 
+    newsockfd = accept(sockfd, 
+                (struct sockaddr *) &cli_addr, 
+                &clilen);
+    if (newsockfd < 0) 
+        error("ERROR on accept");
+
     // main loop
     while(1) {
-        newsockfd = accept(sockfd, 
-                    (struct sockaddr *) &cli_addr, 
-                    &clilen);
-        if (newsockfd < 0) 
-            error("ERROR on accept");
 
         bzero(buffer, 1024);
         n = read(newsockfd, buffer, 1024);
         if (n < 0) error("ERROR reading from socket");
 
         n = write(newsockfd, "OK", 2);
-
         if (n < 0) error("ERROR writing to socket");
-        close(newsockfd);
     }
+    close(newsockfd);
 
     close(sockfd);
     return 0; 

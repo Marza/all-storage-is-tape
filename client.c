@@ -43,13 +43,13 @@ int main(int argc, char *argv[])
         data[i] = 97 + rand() % 26;
     }
 
-    for (int i = 0; i < 1000; i++) {
-        sockfd = socket(AF_INET, SOCK_STREAM, 0);
-        if (sockfd < 0)
-            error("ERROR opening socket");
-        if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
-            error("ERROR connecting");
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0)
+        error("ERROR opening socket");
+    if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
+        error("ERROR connecting");
 
+    for (int i = 0; i < 1000; i++) {
         n = write(sockfd, data, 1024);
         if (n < 0) 
              error("ERROR writing to socket");
@@ -58,10 +58,10 @@ int main(int argc, char *argv[])
         n = read(sockfd, buffer, 255);
         if (n < 0) 
              error("ERROR reading from socket");
-        // printf("%s\n", buffer);
-
-        close(sockfd);
+        printf("%s\n", buffer);
     }
+
+    close(sockfd);
     
     return 0;
 }
