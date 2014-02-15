@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
         n = read(sockfd, buffer, 255);
         if (n < 0) 
              error("ERROR reading from socket");
-        printf("%s\n", buffer);
+        // printf("%s\n", buffer);
 
         close(sockfd);
     }

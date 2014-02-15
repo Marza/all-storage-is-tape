@@ -51,8 +51,6 @@ int main(int argc, char *argv[])
         n = read(newsockfd, buffer, 1024);
         if (n < 0) error("ERROR reading from socket");
 
-        // printf("Here is the message: %s\n", buffer);
-        printf("|");
         n = write(newsockfd, "OK", 2);
 
         if (n < 0) error("ERROR writing to socket");
