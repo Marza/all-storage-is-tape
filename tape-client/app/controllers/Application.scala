@@ -33,19 +33,19 @@ object Application extends Controller {
 
     // network test
     var startTime = System.currentTimeMillis()
-    /*1 to 10 foreach { _ =>
+    1 to 1000 foreach { _ =>
       val response = WS.url("http://marza-mini:9000/store").post(bytes)
       Await.result(response, 5000 millis)
-    }*/
+    }
     var stopTime = System.currentTimeMillis()
     val networkTime = stopTime-startTime
 
     // websocket test
     startTime = System.currentTimeMillis()
-    1 to 1 foreach { _ =>
+    /*1 to 1 foreach { _ =>
       val uri = new URI("ws://localhost:9000/ws")
       new WebSocketClient(uri).run(byteBuf)
-    }
+    }*/
     stopTime = System.currentTimeMillis()
     val wsTime = stopTime-startTime
 
